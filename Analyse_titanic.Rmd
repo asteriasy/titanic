@@ -79,3 +79,5 @@ survival_rate("sex")
 
 On retrouve les mêmes résultats qu'avant.
 
+library(TitanicPackage)
+survival_rate(carData::TitanicSurvival, "sex")
