@@ -1,0 +1,81 @@
+---
+title: "TP Titanic"
+author: "BAHAZ Lina"
+date: "12/11/2026"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Les données
+
+```{r}
+library(carData)
+titanic <- TitanicSurvival
+head(titanic)
+str(titanic)
+```
+
+Le jeu de données contient 1309 passagers du Titanic et 4 variables : survived (si le passager a survécu ou non), sex, age et passengerClass (1ère, 2ème ou 3ème classe). L'équipage n'est pas dedans.
+
+## Statistiques descriptives
+
+```{r}
+summary(titanic)
+```
+
+Il y a 263 valeurs manquantes pour l'âge. 500 personnes ont survécu sur 1309 donc environ 38%. L'âge moyen est de 29,9 ans.
+
+## Survie selon le sexe
+
+```{r}
+sex_tab <- table(titanic$sex, titanic$survived)
+sex_tab
+prop.table(sex_tab, 1)
+barplot(t(sex_tab), beside = TRUE, col = c("red", "green"),
+        legend = c("dead", "survived"), main = "Survival by sex")
+```
+
+## Survie selon la classe
+
+```{r}
+class_tab <- table(titanic$passengerClass, titanic$survived)
+class_tab
+prop.table(class_tab, 1)
+barplot(t(class_tab), beside = TRUE, col = c("red", "green"),
+        legend = c("dead", "survived"), main = "Survival by class")
+```
+
+## Age et survie
+
+```{r}
+boxplot(age ~ survived, data = titanic, col = "lightblue",
+        main = "Age by survival", ylab = "age")
+tapply(titanic$age, titanic$survived, mean, na.rm = TRUE)
+```
+
+## Interprétation
+
+Les femmes ont beaucoup plus survécu que les hommes (73% contre 19%), on retrouve bien le "les femmes et les enfants d'abord". La classe joue aussi : 62% de survie en 1ère classe, 43% en 2ème et seulement 26% en 3ème. Pour l'âge, la différence est petite, les survivants sont un peu plus jeunes en moyenne (28,9 ans contre 30,5) mais les boxplots sont presque pareils.
+
+## Facultatif : régression logistique
+
+```{r}
+model <- glm(survived ~ sex + age + passengerClass, data = titanic, family = binomial)
+summary(model)
+```
+
+Toutes les variables sont significatives. Être un homme diminue beaucoup les chances de survie, et c'est pareil quand on est en 2ème ou 3ème classe par rapport à la 1ère. L'âge a un coefficient négatif donc plus on est vieux moins on a de chances de survivre (ici l'effet se voit mieux qu'avec le boxplot car on tient compte du sexe et de la classe).
+
+## Avec le package
+
+```{r}
+library(TitanicPackage)
+survival_rate("passengerClass")
+survival_rate("sex")
+```
+
+On retrouve les mêmes résultats qu'avant.
+
